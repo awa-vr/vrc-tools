@@ -116,10 +116,15 @@ namespace AwA
             }
             else
             {
-                EditorGUILayout.HelpBox("Some parameters Should not be renamed! Be careful!", MessageType.Warning);
+                // Set vars
+                bool success = SetVars();
+                if (!success)
+                    return;
 
-                showParamsWithNoMenus = EditorGUILayout.Toggle("Paremeters with no menus", showParamsWithNoMenus);
-                showParamsWithSameName = EditorGUILayout.Toggle("Parameters with same name", showParamsWithSameName);
+                // Begin Main UI
+                EditorGUILayout.HelpBox("Some parameters Should not be renamed! Be careful!", MessageType.Warning);
+                showParamsWithNoMenus = EditorGUILayout.ToggleLeft("Show parameters with no menus", showParamsWithNoMenus);
+                showParamsWithSameName = EditorGUILayout.ToggleLeft("Show parameters with same name", showParamsWithSameName);
 
                 if (GUILayout.Button("Refresh"))
                 {
@@ -127,39 +132,6 @@ namespace AwA
                 }
 
                 scrollPos = GUILayout.BeginScrollView(scrollPos);
-
-                fx = Core.GetFXController(avatar);
-                if (fx == null)
-                {
-                    EditorGUILayout.HelpBox("No FX layer found!", MessageType.Error);
-                    return;
-                }
-
-                animatorParameters = fx.parameters;
-                if (animatorParameters.Length == 0)
-                {
-                    EditorGUILayout.HelpBox("No parameters found in the FX controller!", MessageType.Error);
-                    return;
-                }
-
-                vrcParameters = avatar.expressionParameters;
-                if (vrcParameters == null)
-                {
-                    EditorGUILayout.HelpBox("No parameters found in the avatar expression parameters!", MessageType.Error);
-                    return;
-                }
-
-                vrcMainMenu = avatar.expressionsMenu;
-                if (vrcMainMenu == null)
-                {
-                    EditorGUILayout.HelpBox("No main menu found in the avatar descriptor!", MessageType.Error);
-                    return;
-                }
-
-                vrcMenus = new List<VRCExpressionsMenu>
-                {
-                    vrcMainMenu
-                };
 
                 // Get all submenus
                 GetSubMenus(vrcMainMenu, vrcMenus);
@@ -193,7 +165,8 @@ namespace AwA
                     {
                         GUILayout.Label(EditorGUIUtility.IconContent("console.erroricon.sml"), GUILayout.Width(20));
                     }
-                    else {
+                    else
+                    {
                         GUILayout.Space(20);
                     }
                     EditorGUILayout.LabelField("->", GUILayout.Width(20));
@@ -206,6 +179,7 @@ namespace AwA
                         var renameOK = EditorUtility.DisplayDialog("Rename Parameter", "Are you sure you want to rename '" + param.Name + "' to '" + newName + "'?\nMenus containing the parameter are: " + string.Join(", ", param.Menus.Select(x => x.name)), "Yes", "No");
                         if (renameOK)
                         {
+                            // TODO: Fix undo (if possible???)
                             // Rename parameter in FX controller
                             Object[] undoObjects = new Object[] { fx, vrcParameters };
                             foreach (var menu in param.Menus)
@@ -250,6 +224,48 @@ namespace AwA
 
                 GUILayout.EndScrollView();
             }
+        }
+
+        /// <summary>
+        ///     Sets all needed variables
+        /// </summary>
+        /// <returns>If success</returns>
+        bool SetVars()
+        {
+            fx = Core.GetFXController(avatar);
+            if (fx == null)
+            {
+                EditorGUILayout.HelpBox("No FX layer found!", MessageType.Error);
+                return false;
+            }
+
+            animatorParameters = fx.parameters;
+            if (animatorParameters.Length == 0)
+            {
+                EditorGUILayout.HelpBox("No parameters found in the FX controller!", MessageType.Error);
+                return false;
+            }
+
+            vrcParameters = avatar.expressionParameters;
+            if (vrcParameters == null)
+            {
+                EditorGUILayout.HelpBox("No parameters found in the avatar expression parameters!", MessageType.Error);
+                return false;
+            }
+
+            vrcMainMenu = avatar.expressionsMenu;
+            if (vrcMainMenu == null)
+            {
+                EditorGUILayout.HelpBox("No main menu found in the avatar descriptor!", MessageType.Error);
+                return false;
+            }
+
+            vrcMenus = new List<VRCExpressionsMenu>
+            {
+                vrcMainMenu
+            };
+
+            return true;
         }
 
         void Refresh()
