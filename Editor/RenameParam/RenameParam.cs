@@ -188,12 +188,14 @@ namespace AwA
                         }
                     }
 
-                    var style = new GUIStyle(EditorStyles.label);
+                    EditorGUILayout.LabelField(param.Name);
                     if (parameters.Find(p => p != param && p.ReccomendedName == param.ReccomendedName) != null)
                     {
-                        style.normal.textColor = Color.red;
+                        GUILayout.Label(EditorGUIUtility.IconContent("console.erroricon.sml"), GUILayout.Width(20));
                     }
-                    EditorGUILayout.LabelField(param.Name, style);
+                    else {
+                        GUILayout.Space(20);
+                    }
                     EditorGUILayout.LabelField("->", GUILayout.Width(20));
                     param.ReccomendedName = EditorGUILayout.TextField(param.ReccomendedName);
 
