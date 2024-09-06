@@ -79,6 +79,7 @@ namespace AwA
         bool shouldRefresh = true;
         bool showParamsWithNoMenus = false;
         bool showParamsWithSameName = true;
+        bool includeMenuName = true;
         #endregion
 
         [MenuItem("Tools/AwA/Rename Paramater")]
@@ -123,8 +124,15 @@ namespace AwA
 
                 // Begin Main UI
                 EditorGUILayout.HelpBox("Some parameters Should not be renamed! Be careful!", MessageType.Warning);
+                bool sameName = parameters.Any(x => parameters.Count(y => y.ReccomendedName == x.ReccomendedName) > 1);
+                if (sameName)
+                {
+                    EditorGUILayout.HelpBox("Some parameters have the same recommended name! Be extra careful!", MessageType.Error);
+                }
+
                 showParamsWithNoMenus = EditorGUILayout.ToggleLeft("Show parameters with no menus", showParamsWithNoMenus);
                 showParamsWithSameName = EditorGUILayout.ToggleLeft("Show parameters with same name", showParamsWithSameName);
+                includeMenuName = EditorGUILayout.ToggleLeft("Include menu name in reccomended name", includeMenuName);
 
                 if (GUILayout.Button("Refresh"))
                 {
@@ -293,7 +301,7 @@ namespace AwA
                     {
                         if (control.parameter.name == p.Name || control.subParameters.Any(x => x.name == p.Name))
                         {
-                            if (p.Name.Contains(p.Menus[0].name))
+                            if (p.Name.Contains(p.Menus[0].name) || !includeMenuName)
                                 p.ReccomendedName = GetSubstringBeforeLastSlash(p.Name) + control.name;
                             else
                                 p.ReccomendedName = GetSubstringBeforeLastSlash(p.Name) + p.Menus[0].name + "/" + control.name;
