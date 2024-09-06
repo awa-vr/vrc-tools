@@ -122,6 +122,16 @@ namespace AwA
                 if (!success)
                     return;
 
+                // Get all submenus
+                GetSubMenus(vrcMainMenu, vrcMenus);
+
+                // Refresh if needed
+                if (shouldRefresh)
+                {
+                    shouldRefresh = false;
+                    Refresh();
+                }
+
                 // Begin Main UI
                 EditorGUILayout.HelpBox("Some parameters Should not be renamed! Be careful!", MessageType.Warning);
                 bool sameName = parameters.Any(x => parameters.Count(y => y.ReccomendedName == x.ReccomendedName) > 1);
@@ -139,24 +149,25 @@ namespace AwA
                     shouldRefresh = true;
                 }
 
+                // Header
+                EditorGUILayout.BeginHorizontal();
+
+                EditorGUILayout.LabelField("Menu", GUILayout.Width(50));
+                EditorGUILayout.LabelField("Parameter");
+                EditorGUILayout.LabelField("", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Reccomended Name");
+                EditorGUILayout.LabelField("", GUILayout.Width(80));
+
+                EditorGUILayout.EndHorizontal();
+
                 scrollPos = GUILayout.BeginScrollView(scrollPos);
-
-                // Get all submenus
-                GetSubMenus(vrcMainMenu, vrcMenus);
-
-                // Refresh if needed
-                if (shouldRefresh)
-                {
-                    shouldRefresh = false;
-                    Refresh();
-                }
 
                 // Show parameters
                 foreach (var param in parameters)
                 {
                     EditorGUILayout.BeginHorizontal();
 
-                    if (GUILayout.Button("Find", GUILayout.MaxWidth(50), GUILayout.MinWidth(50)))
+                    if (GUILayout.Button("Find", GUILayout.Width(50)))
                     {
                         if (param.Menus.Count > 0)
                         {
@@ -180,7 +191,7 @@ namespace AwA
                     EditorGUILayout.LabelField("->", GUILayout.Width(20));
                     param.ReccomendedName = EditorGUILayout.TextField(param.ReccomendedName);
 
-                    if (GUILayout.Button("Rename", GUILayout.MaxWidth(80), GUILayout.MinWidth(80)))
+                    if (GUILayout.Button("Rename", GUILayout.Width(80)))
                     {
                         var newName = param.ReccomendedName;
                         Debug.Log(newName);
