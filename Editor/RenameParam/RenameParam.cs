@@ -105,6 +105,8 @@ namespace AwA
 
         public void OnGUI()
         {
+            Core.Title("Rename Paramater");
+
             avatar = EditorGUILayout.ObjectField("Avatar", avatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
 
             if (avatar == null)
